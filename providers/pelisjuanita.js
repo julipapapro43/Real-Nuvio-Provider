@@ -1,35 +1,34 @@
 const cheerio = require('cheerio');
 
 async function scrape(type, id) {
-    const baseUrl = "https://pelisjuanita.com";
-    const url = `${baseUrl}/${type}/${id}`;
+    const url = `https://pelisjuanita.com/${type}/${id}`;
     
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+        });
         const html = await response.text();
         
-        // ¡Ojo aquí! Vamos a ver si el HTML realmente tiene el contenido
-        if (html.includes("player_options_ul")) {
-            console.log("¡Encontré el contenedor!");
-        } else {
-            console.log("No encontré el contenedor. La web podría estar bloqueando el acceso.");
-        }
+        // Esto imprimirá el HTML en tus logs para ver si aparecen los servidores
+        console.log("HTML recibido (primeros 500 caracteres):", html.substring(0, 500));
 
         const $ = cheerio.load(html);
+        const elements = $('#player_options_ul li');
+        console.log("Cantidad de servidores encontrados:", elements.length);
+
         let streams = [];
-        
-        $('#player_options_ul li').each((i, el) => {
-            console.log("Servidor detectado:", $(el).attr('data-nume'));
-            
+        elements.each((i, el) => {
             streams.push({
                 title: "Servidor " + $(el).attr('data-nume'),
-                url: `${baseUrl}/?trembed=1&trid=${$(el).attr('data-post')}&trtype=${$(el).attr('data-type')}&trnume=${$(el).attr('data-nume')}`
+                url: `https://pelisjuanita.com/?trembed=1&trid=${$(el).attr('data-post')}&trtype=${type}&trnume=${$(el).attr('data-nume')}`
             });
         });
 
         return streams;
     } catch (error) {
-        console.error("Error crítico:", error);
+        console.error("Error:", error);
         return [];
     }
 }
