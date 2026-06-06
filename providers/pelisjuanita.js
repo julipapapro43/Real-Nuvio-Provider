@@ -7,29 +7,29 @@ async function scrape(type, id) {
     try {
         const response = await fetch(url);
         const html = await response.text();
-        const $ = cheerio.load(html);
         
+        // ¡Ojo aquí! Vamos a ver si el HTML realmente tiene el contenido
+        if (html.includes("player_options_ul")) {
+            console.log("¡Encontré el contenedor!");
+        } else {
+            console.log("No encontré el contenedor. La web podría estar bloqueando el acceso.");
+        }
+
+        const $ = cheerio.load(html);
         let streams = [];
         
-        // Buscamos específicamente dentro de la lista que encontramos en tu captura
         $('#player_options_ul li').each((i, el) => {
-            const serverName = $(el).attr('data-nume'); 
-            const postID = $(el).attr('data-post');
-            const num = $(el).attr('data-nume');
-            const typeVal = $(el).attr('data-type');
-            
-            // Esta es la URL que construye el link del reproductor basándose en el ID del post
-            const streamUrl = `${baseUrl}/?trembed=1&trid=${postID}&trtype=${typeVal}&trnume=${num}`;
+            console.log("Servidor detectado:", $(el).attr('data-nume'));
             
             streams.push({
-                title: `Servidor ${serverName}`,
-                url: streamUrl
+                title: "Servidor " + $(el).attr('data-nume'),
+                url: `${baseUrl}/?trembed=1&trid=${$(el).attr('data-post')}&trtype=${$(el).attr('data-type')}&trnume=${$(el).attr('data-nume')}`
             });
         });
 
         return streams;
     } catch (error) {
-        console.error("Error en el scraping:", error);
+        console.error("Error crítico:", error);
         return [];
     }
 }
