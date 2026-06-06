@@ -1,8 +1,1 @@
-{
-  "id": "pelisjuanita",
-  "name": "PelisJuanita",
-  "version": "1.0.0",
-  "description": "Scraper para PelisJuanita",
-  "types": ["movie", "series", "tv"], 
-  "script": "providers/pelisjuanita.js"
-}
+
