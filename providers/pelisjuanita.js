@@ -11,21 +11,25 @@ async function scrape(type, id) {
         
         let streams = [];
         
-        // Esta es la parte crucial: El selector.
-        // Si el sitio tiene los links en un lugar distinto, aquí es donde falla.
-        $('a.button').each((i, el) => {
-            const link = $(el).attr('href');
-            if (link && link.includes('voe') || link.includes('streamwish')) {
-                streams.push({
-                    title: "Servidor PelisJuanita",
-                    url: link
-                });
-            }
+        // Buscamos específicamente dentro de la lista que encontramos en tu captura
+        $('#player_options_ul li').each((i, el) => {
+            const serverName = $(el).attr('data-nume'); 
+            const postID = $(el).attr('data-post');
+            const num = $(el).attr('data-nume');
+            const typeVal = $(el).attr('data-type');
+            
+            // Esta es la URL que construye el link del reproductor basándose en el ID del post
+            const streamUrl = `${baseUrl}/?trembed=1&trid=${postID}&trtype=${typeVal}&trnume=${num}`;
+            
+            streams.push({
+                title: `Servidor ${serverName}`,
+                url: streamUrl
+            });
         });
 
         return streams;
     } catch (error) {
-        console.error("Error en scraping:", error);
+        console.error("Error en el scraping:", error);
         return [];
     }
 }
