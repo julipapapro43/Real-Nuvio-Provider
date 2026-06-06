@@ -2,28 +2,30 @@ const cheerio = require('cheerio');
 
 async function scrape(type, id) {
     const baseUrl = "https://pelisjuanita.com";
+    const url = `${baseUrl}/${type}/${id}`;
     
     try {
-        // Esta es la lógica que buscará los enlaces dentro de la página
-        const response = await fetch(`${baseUrl}/${type}/${id}`);
+        const response = await fetch(url);
         const html = await response.text();
         const $ = cheerio.load(html);
         
         let streams = [];
         
-        // Aquí extraemos los servidores (esto es un ejemplo basado en la estructura común de PelisJuanita)
-        $('ul#playeroptionsul li').each((index, element) => {
-            const serverName = $(element).attr('data-nume');
-            // La lógica para obtener el link del iframe real
-            streams.push({
-                title: `Servidor ${serverName}`,
-                url: `${baseUrl}/?trembed=1&trid=${id}&trtype=${type}` 
-            });
+        // Esta es la parte crucial: El selector.
+        // Si el sitio tiene los links en un lugar distinto, aquí es donde falla.
+        $('a.button').each((i, el) => {
+            const link = $(el).attr('href');
+            if (link && link.includes('voe') || link.includes('streamwish')) {
+                streams.push({
+                    title: "Servidor PelisJuanita",
+                    url: link
+                });
+            }
         });
 
         return streams;
     } catch (error) {
-        console.error("Error al scrapear PelisJuanita:", error);
+        console.error("Error en scraping:", error);
         return [];
     }
 }
