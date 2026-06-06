@@ -1,17 +1,8 @@
 {
-  "name": "Julito Providers",
+  "id": "pelisjuanita",
+  "name": "PelisJuanita",
   "version": "1.0.0",
-  "scrapers": [
-    {
-      "id": "pelisjuanita",
-      "name": "PelisJuanita",
-      "description": "Películas y series en Latino desde PelisJuanita.",
-      "version": "1.0.0",
-      "author": "Julito",
-      "supportedTypes": ["movie", "tv"],
-      "filename": "providers/pelisjuanita.js",
-      "enabled": true,
-      "contentLanguage": ["es"]
-    }
-  ]
+  "description": "Scraper para PelisJuanita",
+  "types": ["movie", "series", "tv"], 
+  "script": "providers/pelisjuanita.js"
 }
