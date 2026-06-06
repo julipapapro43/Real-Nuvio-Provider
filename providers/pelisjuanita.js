@@ -2,44 +2,53 @@ const cheerio = require('cheerio');
 
 async function scrape(type, id) {
     const baseUrl = "https://pelisjuanita.com";
-    // Nota: Muchas webs de este tipo usan 'embed' como punto de entrada real
     const url = `${baseUrl}/${type}/${id}`;
     
     try {
-        // Usamos un User-Agent de navegador real para evitar el bloqueo inicial
         const response = await fetch(url, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-            }
+            headers: { "User-Agent": "Mozilla/5.0" }
         });
         const html = await response.text();
-        
-        // Buscamos el ID necesario en el HTML
         const $ = cheerio.load(html);
         
-        // A veces el servidor de video está en un atributo llamado 'data-id' 
-        // o escondido dentro de un script que contiene un JSON
         let streams = [];
         
-        // Buscamos dentro de los elementos que cargan el player
-        $('.dooplay_player_option').each((i, el) => {
-            const num = $(el).data('nume');
-            const post = $(el).data('post');
-            const typeVal = $(el).data('type');
+        // Iteramos sobre los botones que ya teníamos identificados
+        const options = $('#player_options_ul li');
+        
+        for (let i = 0; i < options.length; i++) {
+            const el = options[i];
+            const num = $(el).attr('data-nume');
+            const post = $(el).attr('data-post');
+            const typeVal = $(el).attr('data-type');
             
-            // Esta es la llamada real que hace el navegador para obtener el link
-            // Intentamos recrear la URL de la API del reproductor
-            const streamUrl = `${baseUrl}/wp-admin/admin-ajax.php?action=doo_player_ajax&post=${post}&nume=${num}&type=${typeVal}`;
+            // La URL que descubrimos en tu captura de Network
+            const ajaxUrl = `${baseUrl}/wp-admin/admin-ajax.php`;
             
-            streams.push({
-                title: `Servidor ${num}`,
-                url: streamUrl
+            // Hacemos la petición POST tal cual la hace el navegador
+            const ajaxResponse = await fetch(ajaxUrl, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'User-Agent': 'Mozilla/5.0'
+                },
+                body: `action=doo_player_ajax&post=${post}&nume=${num}&type=${typeVal}`
             });
-        });
+            
+            const data = await ajaxResponse.json();
+            
+            // Aquí extraemos el link real del JSON que recibimos
+            if (data.embed_url) {
+                streams.push({
+                    title: `Servidor ${num}`,
+                    url: data.embed_url
+                });
+            }
+        }
 
         return streams;
     } catch (error) {
-        console.error("Error al extraer:", error);
+        console.error("Error al obtener los links:", error);
         return [];
     }
 }
