@@ -1,0 +1,17 @@
+{
+  "name": "Julito Providers",
+  "version": "1.0.0",
+  "scrapers": [
+    {
+      "id": "pelisjuanita",
+      "name": "PelisJuanita",
+      "description": "Películas y series en Latino desde PelisJuanita.",
+      "version": "1.0.0",
+      "author": "Maizzeno",
+      "supportedTypes": ["movie", "tv"],
+      "filename": "providers/pelisjuanita.js",
+      "enabled": true,
+      "contentLanguage": ["es"]
+    }
+  ]
+}
