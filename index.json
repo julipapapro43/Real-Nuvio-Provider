@@ -7,7 +7,7 @@
       "name": "PelisJuanita",
       "description": "Películas y series en Latino desde PelisJuanita.",
       "version": "1.0.0",
-      "author": "Maizzeno",
+      "author": "Julito",
       "supportedTypes": ["movie", "tv"],
       "filename": "providers/pelisjuanita.js",
       "enabled": true,
